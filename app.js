@@ -8,8 +8,10 @@
         expenseParent : '.expenses__list',
         budgetTotalValue : '.budget__value',
         incomeValue : '.budget__income--value',
-        expensesValue : '.budget__expenses--value'
-
+        expensesValue : '.budget__expenses--value',
+        month : '.budget__title--month',
+        container : '.container',
+        deleteButton : 'ion-ios-close-outline'
     };
 
     var dataObject = function (type, description , value) {
@@ -47,10 +49,23 @@
             updateBudget : function (dataObject) {
                 if(dataObject.type === 'inc'){
                    data.income += parseInt(dataObject.value);
+                   data.totalBalance += parseInt(dataObject.value);
                 } else if(dataObject.type === 'exp') {
-                    data.expanse += parseInt(dataObject.value);
+                    data.expanse -= parseInt(dataObject.value);
+                    data.totalBalance -= parseInt(dataObject.value);
                 }
-                data.totalBalance += parseInt(dataObject.value);
+
+            },
+
+            deleteElem : function (id) {
+                var deleteElem = data.dataObjects.find(function (value) {
+                    if(value.id === id) {
+                        return value;
+                    }
+                });
+                var index = data.dataObjects.indexOf(deleteElem);
+                data.dataObjects.splice(index, 1);
+
             }
         }
 
@@ -58,7 +73,6 @@
     })();
 
     var UIController = (function () {
-
 
 
         return {
@@ -91,18 +105,36 @@
                 htmlElem = htmlElem.replace('%value', dataObject.value);
 
                 if(dataObject.type === 'inc') {
-                    htmlElem = htmlElem.replace('%id', 'income-' + dataObject.id);
+                    htmlElem = htmlElem.replace('%id', dataObject.id);
                     document.querySelector(classIDs.incomeParent).insertAdjacentHTML("beforeend", htmlElem);
                 } else if (dataObject.type === 'exp') {
-                    htmlElem = htmlElem.replace('%id', 'expense-' + dataObject.id);
+                    htmlElem = htmlElem.replace('%id', dataObject.id);
                     document.querySelector(classIDs.expenseParent).insertAdjacentHTML("beforeend", htmlElem);
                 }
             },
 
             updateDataUI : function (data) {
-                document.querySelector(classIDs.budgetTotalValue).value = data.totalBalance;
-                document.querySelector(classIDs.incomeValue).value = data.income;
-                document.querySelector(classIDs.expensesValue).value = data.expanse;
+                document.querySelector(classIDs.budgetTotalValue).textContent = data.totalBalance;
+                document.querySelector(classIDs.incomeValue).textContent = data.income;
+                document.querySelector(classIDs.expensesValue).textContent = data.expanse;
+            },
+
+            validateInput : function (dataObject) {
+                if(dataObject.value === 0 || isNaN(dataObject.value) || dataObject.value.length === 0) {
+                    return false
+                }
+                if(dataObject.description.length === 0) {
+                    return false;
+                }
+                return true;
+            },
+
+            deleteFromUI : function (event) {
+                var node = event.target.parentNode.parentNode.parentNode.parentNode;
+                var id = node.id;
+                node.parentNode.removeChild(node);
+
+                return id;
             }
         }
 
@@ -111,33 +143,47 @@
     var mainController = (function (budgetController, UIController) {
 
 
-        function addElement() {
+        function addElement () {
 
             var dataObject = UIController.getInputElement();
-
             UIController.cleanFields();
 
-            budgetController.addDataObject(dataObject);
+            if(UIController.validateInput(dataObject)) {
 
-            UIController.addElementToUI(dataObject);
+                budgetController.addDataObject(dataObject);
+                UIController.addElementToUI(dataObject);
+                budgetController.updateBudget(dataObject);
+                UIController.updateDataUI(budgetController.getData());
 
-            budgetController.updateBudget(dataObject);
+            } else {
+                alert('validation error!');
+            }
 
-            UIController.updateDataUI(budgetController.getData());
+        }
+
+        function deleteElement (event) {
+
+            var id =UIController.deleteFromUI(event);
+            budgetController.deleteElem(id);
 
         }
 
         return {
             initialize : function () {
 
-                document.querySelector(classIDs.addbtn).addEventListener('click', function (event) {
+                const monthNames = ["January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"
+                ];
+                document.querySelector(classIDs.addbtn).addEventListener('click', function () {
                     addElement();
                 });
-
+                document.querySelector(classIDs.month).textContent = monthNames[new Date().getMonth()];
+                document.querySelector(classIDs.container).addEventListener('click', function (event) {
+                    if(event.target.className === classIDs.deleteButton)
+                    deleteElement(event);
+                });
             }
         }
-
-
 
     })(budgetController, UIController);
 
