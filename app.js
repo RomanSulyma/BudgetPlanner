@@ -85,7 +85,7 @@
             calculatePercent : function () {
 
                 data.dataObjects.forEach(function (value ) {
-                    value.percent = Math.round((value.value / data.totalBalance) * 100);
+                    value.percent = Math.abs(Math.round((value.value / data.totalBalance) * 100));
                 })
 
             }
@@ -161,7 +161,19 @@
                 node.parentNode.removeChild(node);
 
                 return id;
+            },
+
+            changeColor : function () {
+            document.querySelector(classIDs.addbtn).classList.toggle('red');
+                document.querySelector(classIDs.addbtn).classList.toggle('red-focus');
+            document.querySelector(classIDs.inputValue).classList.toggle('red');
+                document.querySelector(classIDs.inputValue).classList.toggle('red-focus');
+            document.querySelector(classIDs.inputDescription).classList.toggle('red');
+                document.querySelector(classIDs.inputDescription).classList.toggle('red-focus');
+            document.querySelector(classIDs.inputType).classList.toggle('red');
+                document.querySelector(classIDs.inputType).classList.toggle('red-focus');
             }
+
         }
 
     })();
@@ -209,9 +221,13 @@
                 });
                 document.querySelector(classIDs.month).textContent = monthNames[new Date().getMonth()];
                 document.querySelector(classIDs.container).addEventListener('click', function (event) {
-                    if(event.target.className === classIDs.deleteButton)
-                    deleteElement(event);
+                    if(event.target.className === classIDs.deleteButton) {
+                        deleteElement(event);
+                    }
                 });
+                document.querySelector(classIDs.inputType).addEventListener('change', function () {
+                    UIController.changeColor();
+                })
             }
         }
 
