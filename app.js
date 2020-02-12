@@ -46,17 +46,6 @@
                 return data;
             },
 
-            updateBudget : function (dataObject) {
-                if(dataObject.type === 'inc'){
-                   data.income += parseInt(dataObject.value);
-                   data.totalBalance += parseInt(dataObject.value);
-                } else if(dataObject.type === 'exp') {
-                    data.expanse -= parseInt(dataObject.value);
-                    data.totalBalance -= parseInt(dataObject.value);
-                }
-
-            },
-
             deleteElem : function (id) {
                 var deleteElem = data.dataObjects.find(function (value) {
                     if(value.id === id) {
@@ -65,6 +54,28 @@
                 });
                 var index = data.dataObjects.indexOf(deleteElem);
                 data.dataObjects.splice(index, 1);
+
+            },
+
+            calculateBudget : function () {
+
+                var total = 0, income = 0, expanse = 0;
+
+                 data.dataObjects.forEach(function (value) {
+
+                     if(value.type === 'inc'){
+                         total += parseInt(value.value);
+                         income += parseInt(value.value);
+                     } else if(value.type === 'exp') {
+                         total -= parseInt(value.value);
+                         expanse += parseInt(value.value);
+                     }
+
+                });
+
+                data.totalBalance = total;
+                data.expanse = expanse;
+                data.income = income;
 
             }
         }
@@ -152,7 +163,7 @@
 
                 budgetController.addDataObject(dataObject);
                 UIController.addElementToUI(dataObject);
-                budgetController.updateBudget(dataObject);
+                budgetController.calculateBudget();
                 UIController.updateDataUI(budgetController.getData());
 
             } else {
@@ -163,8 +174,10 @@
 
         function deleteElement (event) {
 
-            var id =UIController.deleteFromUI(event);
+            var id = UIController.deleteFromUI(event);
             budgetController.deleteElem(id);
+            budgetController.calculateBudget();
+            UIController.updateDataUI(budgetController.getData());
 
         }
 
