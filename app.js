@@ -11,13 +11,16 @@
         expensesValue : '.budget__expenses--value',
         month : '.budget__title--month',
         container : '.container',
-        deleteButton : 'ion-ios-close-outline'
+        deleteButton : 'ion-ios-close-outline',
+        UIPercentage : '.item__percentage'
     };
 
     var dataObject = function (type, description , value) {
         this.type = type;
         this.value = value;
         this.description = description;
+        this.id = 0;
+        this.percent = 0;
     };
 
     var budgetController = (function () {
@@ -77,6 +80,14 @@
                 data.expanse = expanse;
                 data.income = income;
 
+            },
+
+            calculatePercent : function () {
+
+                data.dataObjects.forEach(function (value ) {
+                    value.percent = Math.round((value.value / data.totalBalance) * 100);
+                })
+
             }
         }
 
@@ -128,10 +139,14 @@
                 document.querySelector(classIDs.budgetTotalValue).textContent = data.totalBalance;
                 document.querySelector(classIDs.incomeValue).textContent = data.income;
                 document.querySelector(classIDs.expensesValue).textContent = data.expanse;
+
+                data.dataObjects.forEach(function (value ) {
+                    document.getElementById(value.id).querySelector(classIDs.UIPercentage).textContent = value.percent + '%';
+                })
             },
 
             validateInput : function (dataObject) {
-                if(dataObject.value === 0 || isNaN(dataObject.value) || dataObject.value.length === 0) {
+                if(dataObject.value == 0 || isNaN(dataObject.value) || dataObject.value.length === 0 || dataObject.value.includes('-')) {
                     return false
                 }
                 if(dataObject.description.length === 0) {
@@ -164,6 +179,7 @@
                 budgetController.addDataObject(dataObject);
                 UIController.addElementToUI(dataObject);
                 budgetController.calculateBudget();
+                budgetController.calculatePercent();
                 UIController.updateDataUI(budgetController.getData());
 
             } else {
@@ -177,6 +193,7 @@
             var id = UIController.deleteFromUI(event);
             budgetController.deleteElem(id);
             budgetController.calculateBudget();
+            budgetController.calculatePercent();
             UIController.updateDataUI(budgetController.getData());
 
         }
