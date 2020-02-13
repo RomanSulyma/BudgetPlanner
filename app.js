@@ -78,6 +78,11 @@
                 data.incomePercent = Math.abs(Math.round((data.income / data.totalBalance) * 100));
                 data.expansePercent = Math.abs(Math.round((data.expanse / data.totalBalance) * 100));
 
+                if(data.expanse == 0 || data.income == 0) {
+                    data.incomePercent = 0;
+                    data.expansePercent = 0;
+                }
+
             },
 
             getDataObject : function (type, description, value) {
@@ -108,17 +113,6 @@
             incomePercentage : '.budget__income--percentage'
         };
 
-        var htmlElem = '<div class="item clearfix" id="%id">\n' +
-            '                    <div class="item__description">%description</div>\n' +
-            '                    <div class="right clearfix">\n' +
-            '                        <div class="item__value">%value</div>\n' +
-            '                        <div class="item__percentage">10%</div>\n' +
-            '                        <div class="item__delete">\n' +
-            '                            <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>\n' +
-            '                        </div>\n' +
-            '                    </div>\n' +
-            '                </div>';
-
         return {
 
             getInputElement : function () {
@@ -135,6 +129,17 @@
             },
 
             addElementToUI : function (dataObject) {
+
+                var htmlElem = '<div class="item clearfix" id="%id">\n' +
+                    '                    <div class="item__description">%description</div>\n' +
+                    '                    <div class="right clearfix">\n' +
+                    '                        <div class="item__value">%value</div>\n' +
+                    '                        <div class="item__percentage">10%</div>\n' +
+                    '                        <div class="item__delete">\n' +
+                    '                            <button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button>\n' +
+                    '                        </div>\n' +
+                    '                    </div>\n' +
+                    '                </div>';
 
                 htmlElem = htmlElem.replace('%description', dataObject.description);
                 htmlElem = htmlElem.replace('%value', dataObject.value);
@@ -157,9 +162,8 @@
                     document.getElementById(value.id).querySelector(DOMNames.UIPercentage).textContent = value.percent + '%';
                 });
 
-                document.querySelector(DOMNames.incomePercentage).textContent = data.incomePercent + '%';
-                document.querySelector(DOMNames.expencesPercentage).textContent = data.expansePercent + '%';
-
+                    document.querySelector(DOMNames.incomePercentage).textContent = data.incomePercent + '%';
+                    document.querySelector(DOMNames.expencesPercentage).textContent = data.expansePercent + '%';
             },
 
             validateInput : function (dataObject) {
