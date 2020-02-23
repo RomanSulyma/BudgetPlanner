@@ -39,7 +39,7 @@
             deleteElem : function (id) {
 
                 var deleteElem = data.dataObjects.find(function (value) {
-                    if(value.id === id) {
+                    if(value.id == id) {
                         return value;
                     }
                 });
